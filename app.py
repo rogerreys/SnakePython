@@ -8,6 +8,9 @@ from src.food import Food;
 
 class SnakeGame:
     def __init__(self, config):
+        pygame.init()
+        pygame.font.init()  # Inicializa la biblioteca de fuentes
+
         self.config_file = config
         # Screen
         self.width = config["screen"]["width"]
@@ -37,6 +40,8 @@ class SnakeGame:
 
         self.length = config["snake"]["length"]
         self.clock_speed = config["speed"]["clock"]
+        self.font_score = pygame.font.Font(None, 60)
+        self.score=0
     
     def run(self):
         while True:
@@ -51,8 +56,11 @@ class SnakeGame:
             self.snake_action.move()
             # Detecta coliciones
             self.detectCollition()
+            
             # Dibujar los objetos en la pantalla
             self.draw()
+            #
+            self.font()
             # Actualizar la pantalla
             self.updateScreen()
 
@@ -68,6 +76,7 @@ class SnakeGame:
             # Aumentar el tamaño de la serpiente
             self.length += self.config_file["speed"]["snake_grow_sp"]
             self.clock_speed += self.config_file["speed"]["clock_speed"]
+            self.score+=1
         # Detecta colision serpiente con sigo misma
         for snake_coll in self.snake_segments[1:]:
             if self.snake_segments[0].rect.colliderect(snake_coll.rect):
@@ -101,6 +110,11 @@ class SnakeGame:
         pygame.display.flip()
         self.clock.tick(self.clock_speed)
 
+    def font(self):        
+        text = self.font_score.render(f"Score: {self.score}", True, (255,255,255))
+        post_text_p1_x = self.width-(self.width*0.2)
+        post_text_p1_y = self.height-(self.height*.1)
+        self.screen.blit(text, (post_text_p1_x, post_text_p1_y))
 
 def init(config_file):
     with open(config_file, 'r') as file:
