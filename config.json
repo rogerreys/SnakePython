@@ -8,13 +8,16 @@
         "pos_x":0,
         "pos_y":0,
         "width": 5,
-        "height": 5
+        "height": 5,
+        "color":[0,255,0],
+        "color_init":[0,0,0]
     },
     "food": {
         "pos_x":200,
         "pos_y":200,
         "width": 30,
-        "height": 20
+        "height": 20,
+        "color":[255,255,10]
     },
     "speed":{
         "clock": 15,

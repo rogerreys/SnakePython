@@ -1,10 +1,12 @@
 import pygame, sys
 
 class Snake(pygame.sprite.Sprite):
-    def __init__(self,  x, y, width, height):
+    def __init__(self,  x, y, w, h, c):
         super().__init__()
+        width = w
+        height = h
         self.image = pygame.Surface((width, height))
-        self.image.fill((0, 255, 0))
+        self.image.fill(list(c))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y

@@ -19,7 +19,8 @@ class SnakeGame:
                         config["snake"]["pos_x"], 
                         config["snake"]["pos_y"], 
                         config["snake"]["width"],
-                        config["snake"]["height"]
+                        config["snake"]["height"],
+                        config["snake"]["color_init"]
                     )
         self.snake_segments = [self.snake]
         self.snake_action = SnakeActions(self.snake)
@@ -46,18 +47,15 @@ class SnakeGame:
                     sys.exit()
             
             # Mover la serpiente
-            # self.snake_action.update(self.screen)
             self.update()
-
             self.snake_action.move()
             # Detecta coliciones
             self.detectCollition()
             # Dibujar los objetos en la pantalla
             self.draw()
-
             # Actualizar la pantalla
-            pygame.display.flip()
-            self.clock.tick(self.clock_speed)
+            self.updateScreen()
+
 
     def detectCollition(self):
         # Verificar colisiones serpiente y comida
@@ -87,7 +85,7 @@ class SnakeGame:
         new_y = head.rect.y + self.snake.direction[1] * head.rect.height
 
         # Añade un nuevo segmento en la posición actual de la cabeza
-        new_segment = Snake(new_x, new_y, head.rect.width, head.rect.height)
+        new_segment = Snake(new_x, new_y, head.rect.width, head.rect.height, self.config_file["snake"]["color"])
         self.snake_segments.insert(0, new_segment)
         
         if(len(self.snake_segments) > self.length):
@@ -98,6 +96,11 @@ class SnakeGame:
         self.all_sprites.draw(self.screen)
         for segment in self.snake_segments:
             self.screen.blit(segment.image, segment.rect)
+
+    def updateScreen(self):
+        pygame.display.flip()
+        self.clock.tick(self.clock_speed)
+
 
 def init(config_file):
     with open(config_file, 'r') as file:

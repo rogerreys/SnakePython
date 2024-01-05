@@ -8,7 +8,7 @@ class Food(pygame.sprite.Sprite):
         h = config_file["food"]["height"]
 
         self.image = pygame.Surface((w, h))
-        self.image.fill((255, 0, 0))
+        self.image.fill(list(config_file["food"]["color"]))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
