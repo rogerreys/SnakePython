@@ -1,0 +1,24 @@
+{
+    "screen": {
+        "width": 1366,
+        "height": 768
+    },
+    "snake": {
+        "length": 20,
+        "pos_x":0,
+        "pos_y":0,
+        "width": 5,
+        "height": 5
+    },
+    "food": {
+        "pos_x":200,
+        "pos_y":200,
+        "width": 30,
+        "height": 20
+    },
+    "speed":{
+        "clock": 15,
+        "clock_speed": 6,
+        "snake_grow_sp": 5
+    }
+}

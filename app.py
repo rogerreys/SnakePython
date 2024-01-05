@@ -1,30 +1,41 @@
-import pygame, sys
+import pygame
+import sys
 import random
+import json
 from src.snake import Snake;
 from src.snake_actions import SnakeActions;
 from src.food import Food;
 
-
 class SnakeGame:
-    def __init__(self):
+    def __init__(self, config):
+        self.config_file = config
         # Screen
-        self.width = 1366
-        self.height = 768
+        self.width = config["screen"]["width"]
+        self.height = config["screen"]["height"]
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.clock = pygame.time.Clock()
         # 
-        self.snake = Snake(0, 0, 10, 10)
+        self.snake = Snake(
+                        config["snake"]["pos_x"], 
+                        config["snake"]["pos_y"], 
+                        config["snake"]["width"],
+                        config["snake"]["height"]
+                    )
         self.snake_segments = [self.snake]
         self.snake_action = SnakeActions(self.snake)
-        self.food = Food(200, 200)
+        self.food = Food(
+            config["food"]["pos_x"], 
+            config["food"]["pos_y"], 
+            config
+        )
 
         #
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.snake)
         self.all_sprites.add(self.food)
 
-        self.length = 10
-        self.clock_speek = 10
+        self.length = config["snake"]["length"]
+        self.clock_speed = config["speed"]["clock"]
     
     def run(self):
         while True:
@@ -46,20 +57,24 @@ class SnakeGame:
 
             # Actualizar la pantalla
             pygame.display.flip()
-            self.clock.tick(self.clock_speek)
+            self.clock.tick(self.clock_speed)
 
     def detectCollition(self):
-        # Verificar colisiones
+        # Verificar colisiones serpiente y comida
         if self.snake_segments[0].rect.colliderect(self.food.rect):
             # Crear una nueva pieza de comida
             self.all_sprites.remove(self.food)
-            self.food = Food(random.randint(0, self.width - 10), random.randint(0, self.height - 10))
+            self.food = Food(random.randint(0, self.width - 10), random.randint(0, self.height - 10), self.config_file)
             self.all_sprites.add(self.food)
             # La serpiente ha comido la comida
             # Aumentar el tamaño de la serpiente
-            self.length += 5
-            self.clock_speek += 2
-
+            self.length += self.config_file["speed"]["snake_grow_sp"]
+            self.clock_speed += self.config_file["speed"]["clock_speed"]
+        # Detecta colision serpiente con sigo misma
+        for snake_coll in self.snake_segments[1:]:
+            if self.snake_segments[0].rect.colliderect(snake_coll.rect):
+                pygame.quit()
+                sys.exit()
 
     def update(self):
         if self.snake_segments[0].rect.x < 0 or self.snake_segments[0].rect.x > self.screen.get_width() or self.snake_segments[0].rect.y < 0 or self.snake_segments[0].rect.y > self.screen.get_height():
@@ -75,7 +90,7 @@ class SnakeGame:
         new_segment = Snake(new_x, new_y, head.rect.width, head.rect.height)
         self.snake_segments.insert(0, new_segment)
         
-        if(len(self.snake_segments)>self.length):
+        if(len(self.snake_segments) > self.length):
             self.snake_segments.pop()
 
     def draw(self):
@@ -84,6 +99,12 @@ class SnakeGame:
         for segment in self.snake_segments:
             self.screen.blit(segment.image, segment.rect)
 
+def init(config_file):
+    with open(config_file, 'r') as file:
+        config_data = json.load(file)
+    return config_data
+
 if __name__ == "__main__":
-    game = SnakeGame()
+    config = init(".\config.json")
+    game = SnakeGame(config)
     game.run()
