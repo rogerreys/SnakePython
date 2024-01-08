@@ -17,14 +17,15 @@
         "pos_y":200,
         "width": 11,
         "height": 11,
-        "color":[255,255,10]
+        "color":[255,255,10],
+        "margin": 15
     },
     "margin": {
         "x":20,
         "y":20,
         "h":50,
         "color":[255,255,255],
-        "rest":10
+        "pos":10
     },
     "speed":{
         "clock": 15,

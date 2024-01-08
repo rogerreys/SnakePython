@@ -69,16 +69,17 @@ class SnakeGame:
         pygame.quit()
 
     def detectCollition(self):
-        pos = 10
+        pos = self.config_file["margin"]["pos"]
         # Verificar colisiones serpiente y comida
         if not self.snake_segments[0].rect.colliderect((self.margin_x+pos, self.margin_y+pos, self.margin_width-(pos*2), self.margin_height-(pos*2))):
             self.start_game = False
         
         # Verificar colisiones serpiente y comida
         if self.snake_segments[0].rect.colliderect(self.food.rect):
+            margen = self.config_file["food"]["margin"]
             # Crear una nueva pieza de comida
-            self.all_sprites.remove(self.food)
-            self.food = Food(random.randint(self.margin_x - 10, self.margin_width - 10), random.randint(self.margin_y - 10, self.margin_height - 10 ), self.config_file)
+            self.all_sprites.remove(self.food)            
+            self.food = Food(random.randint(self.margin_x + 1, self.margin_width+5), random.randint(self.margin_y + 1, self.margin_height + 5), self.config_file)
             self.all_sprites.add(self.food)
             # La serpiente ha comido la comida
             # Aumentar el tamaño de la serpiente
