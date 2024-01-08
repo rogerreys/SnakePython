@@ -15,9 +15,14 @@ class SnakeGame:
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.clock = pygame.time.Clock()
         # 
+        self.margin_x = config["margin"]["x"]
+        self.margin_y = config["margin"]["y"]
+        self.margin_height = self.height - 2 * self.margin_x - config["margin"]["h"]
+        self.margin_width = self.width - 2 * self.margin_y 
+
         self.snake = Snake(
-                        config["snake"]["pos_x"], 
-                        config["snake"]["pos_y"], 
+                        self.margin_x*2, 
+                        self.margin_y*2, 
                         config["snake"]["width"],
                         config["snake"]["height"],
                         config["snake"]["color_init"]
@@ -56,7 +61,7 @@ class SnakeGame:
             self.detectCollition()
             # Dibujar los objetos en la pantalla
             self.draw()
-            #
+            
             self.fontGame()
             # Actualizar la pantalla
             self.updateScreen()
@@ -64,11 +69,16 @@ class SnakeGame:
         pygame.quit()
 
     def detectCollition(self):
+        pos = 10
+        # Verificar colisiones serpiente y comida
+        if not self.snake_segments[0].rect.colliderect((self.margin_x+pos, self.margin_y+pos, self.margin_width-(pos*2), self.margin_height-(pos*2))):
+            self.start_game = False
+        
         # Verificar colisiones serpiente y comida
         if self.snake_segments[0].rect.colliderect(self.food.rect):
             # Crear una nueva pieza de comida
             self.all_sprites.remove(self.food)
-            self.food = Food(random.randint(0, self.width - 10), random.randint(0, self.height - 10), self.config_file)
+            self.food = Food(random.randint(self.margin_x - 10, self.margin_width - 10), random.randint(self.margin_y - 10, self.margin_height - 10 ), self.config_file)
             self.all_sprites.add(self.food)
             # La serpiente ha comido la comida
             # Aumentar el tamaño de la serpiente
@@ -98,6 +108,8 @@ class SnakeGame:
 
     def draw(self):
         self.screen.fill((0, 0, 0))
+        # Dibujar el margen
+        pygame.draw.rect(self.screen, (255, 255, 255), (self.margin_x, self.margin_y, self.margin_width, self.margin_height))
         self.all_sprites.draw(self.screen)
         for segment in self.snake_segments:
             self.screen.blit(segment.image, segment.rect)
@@ -107,9 +119,10 @@ class SnakeGame:
         self.clock.tick(self.clock_speed)
 
     def fontGame(self):
-        text = self.font.render(f"Score: {self.score}", True, (255,255,255))
-        post_text_p1_x = self.width-(self.width*0.2)
-        post_text_p1_y = self.height-(self.height*.1)
+        msg = self.config_file["score"]["msg"]
+        text = self.font.render(f"{msg} {self.score}", True, list(self.config_file["score"]["color"]))
+        post_text_p1_x = self.width - (self.width*0.2)
+        post_text_p1_y = self.height - (self.height*.07)
         self.screen.blit(text, (post_text_p1_x, post_text_p1_y))
 
     def show_menu(self):
