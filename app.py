@@ -33,37 +33,38 @@ class SnakeGame:
             config
         )
 
-        #
+        # Grupo
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.snake)
         self.all_sprites.add(self.food)
 
         self.length = config["snake"]["length"]
         self.clock_speed = config["speed"]["clock"]
-        self.font_score = pygame.font.Font(None, 60)
-        self.score=0
+        self.font = pygame.font.Font(None, 60)
+        self.score = 0
+
+        self.start_game = True
     
     def run(self):
-        while True:
+        while self.start_game:
             # Procesar los eventos
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-            
+                    self.start_game = False
+
             # Mover la serpiente
             self.update()
             self.snake_action.move()
             # Detecta coliciones
             self.detectCollition()
-            
             # Dibujar los objetos en la pantalla
             self.draw()
             #
-            self.font()
+            self.fontGame()
             # Actualizar la pantalla
             self.updateScreen()
-
+        
+        pygame.quit()
 
     def detectCollition(self):
         # Verificar colisiones serpiente y comida
@@ -80,13 +81,11 @@ class SnakeGame:
         # Detecta colision serpiente con sigo misma
         for snake_coll in self.snake_segments[1:]:
             if self.snake_segments[0].rect.colliderect(snake_coll.rect):
-                pygame.quit()
-                sys.exit()
+                self.start_game = False
 
     def update(self):
         if self.snake_segments[0].rect.x < 0 or self.snake_segments[0].rect.x > self.screen.get_width() or self.snake_segments[0].rect.y < 0 or self.snake_segments[0].rect.y > self.screen.get_height():
-            pygame.quit()
-            sys.exit()
+            self.start_game = False
 
         # Mueve la serpiente en la dirección actual
         head = self.snake_segments[0]
@@ -110,18 +109,37 @@ class SnakeGame:
         pygame.display.flip()
         self.clock.tick(self.clock_speed)
 
-    def font(self):        
-        text = self.font_score.render(f"Score: {self.score}", True, (255,255,255))
+    def fontGame(self):
+        text = self.font.render(f"Score: {self.score}", True, (255,255,255))
         post_text_p1_x = self.width-(self.width*0.2)
         post_text_p1_y = self.height-(self.height*.1)
         self.screen.blit(text, (post_text_p1_x, post_text_p1_y))
+
+    def show_menu(self):
+        menu_text = self.font.render("Presiona SPACE para jugar", True, (255,255,255))
+        self.screen.blit(menu_text, (self.width // 2 - menu_text.get_width() // 2, self.height // 2 - menu_text.get_height() // 2))
+        pygame.display.flip()
+
+        waiting_for_key = True
+        while waiting_for_key:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    waiting_for_key = False
 
 def init(config_file):
     with open(config_file, 'r') as file:
         config_data = json.load(file)
     return config_data
 
+def game_cycle(config_file):
+    while True:
+        game = SnakeGame(config_file)
+        game.show_menu()
+        game.run()
+
 if __name__ == "__main__":
     config = init(".\config.json")
-    game = SnakeGame(config)
-    game.run()
+    game_cycle(config)
