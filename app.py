@@ -8,9 +8,6 @@ from src.food import Food;
 
 class SnakeGame:
     def __init__(self, config):
-        pygame.init()
-        pygame.font.init()  # Inicializa la biblioteca de fuentes
-
         self.config_file = config
         # Screen
         self.width = config["screen"]["width"]
@@ -116,8 +113,13 @@ class SnakeGame:
         self.screen.blit(text, (post_text_p1_x, post_text_p1_y))
 
     def show_menu(self):
-        menu_text = self.font.render("Presiona SPACE para jugar", True, (255,255,255))
-        self.screen.blit(menu_text, (self.width // 2 - menu_text.get_width() // 2, self.height // 2 - menu_text.get_height() // 2))
+        msg = """Presiona 'SPACE' para jugar\n\nPresionar 'Q' para cerrar juego"""
+        lines = msg.splitlines()
+        for i, line in enumerate(lines):
+            menu_text = self.font.render(line, True, (255,255,255))
+            self.screen.blit(menu_text, (self.width // 2 - menu_text.get_width() // 2, self.height // 2 - menu_text.get_height() // 2 + i * 40))
+        
+        
         pygame.display.flip()
 
         waiting_for_key = True
@@ -128,6 +130,9 @@ class SnakeGame:
                     sys.exit()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     waiting_for_key = False
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                    pygame.quit()
+                    sys.exit()
 
 def init(config_file):
     with open(config_file, 'r') as file:
@@ -136,6 +141,9 @@ def init(config_file):
 
 def game_cycle(config_file):
     while True:
+        pygame.init()
+        pygame.font.init()  # Inicializa la biblioteca de fuentes
+
         game = SnakeGame(config_file)
         game.show_menu()
         game.run()
